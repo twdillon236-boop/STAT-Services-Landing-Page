@@ -58,23 +58,23 @@
           <h2>Support services designed for busy business owners</h2>
         </div>
         <div class="service-grid">
-          <article class="service-card">
+          <article class="service-card" id="quickbooks">
             <h3>QuickBooks Support</h3>
             <p>Get help managing your books, navigating reports, and making QuickBooks work better for your business.</p>
           </article>
-          <article class="service-card">
+          <article class="service-card" id="training">
             <h3>Setup &amp; Training</h3>
             <p>Receive guided setup and practical training so your systems and workflows are ready from day one.</p>
           </article>
-          <article class="service-card">
+          <article class="service-card" id="bookkeeping">
             <h3>Bookkeeping</h3>
             <p>Stay on top of your records with organized, dependable bookkeeping support that keeps your finances clear.</p>
           </article>
-          <article class="service-card">
+          <article class="service-card" id="notary">
             <h3>Notary Services</h3>
             <p>Handle important documents with confidence through accessible notary support for your business needs.</p>
           </article>
-          <article class="service-card">
+          <article class="service-card" id="new-business">
             <h3>New Business Setup</h3>
             <p>Start strong with support for setting up your new business processes, records, and operational essentials.</p>
           </article>
@@ -164,5 +164,35 @@
       <a href="mailto:Support@STATIndy.com">Support@STATIndy.com</a>
     </div>
   </footer>
+
+  <div class="chatbot" aria-live="polite">
+    <button class="chatbot-toggle" id="chatbotToggle" aria-expanded="false" aria-controls="chatbotPanel">
+      Chat with STAT
+    </button>
+    <div class="chatbot-panel" id="chatbotPanel" hidden>
+      <div class="chatbot-header">
+        <div>
+          <strong>STAT Assistant</strong>
+          <p>What can I help you with?</p>
+        </div>
+        <button class="chatbot-close" id="chatbotClose" aria-label="Close chatbot">×</button>
+      </div>
+      <div class="chatbot-body" id="chatbotBody">
+        <div class="chatbot-message bot-message">
+          Hi! I can help guide you to the right service. Choose an option below to get started.
+        </div>
+        <div class="chatbot-options" id="chatbotOptions">
+          <button data-choice="quickbooks">QuickBooks support</button>
+          <button data-choice="training">Setup &amp; training</button>
+          <button data-choice="bookkeeping">Bookkeeping</button>
+          <button data-choice="notary">Notary services</button>
+          <button data-choice="new-business">New business setup</button>
+          <button data-choice="consultation">Request a consultation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
