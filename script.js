@@ -1,46 +1,26 @@
 const chatbotToggle = document.getElementById('chatbotToggle');
 const chatbotPanel = document.getElementById('chatbotPanel');
 const chatbotClose = document.getElementById('chatbotClose');
-const chatbotBody = document.getElementById('chatbotBody');
-const chatbotOptions = document.getElementById('chatbotOptions');
+const chatbotMessages = document.getElementById('chatbotMessages');
+const chatbotQuickActions = document.getElementById('chatbotQuickActions');
+const chatbotForm = document.getElementById('chatbotForm');
+const chatbotInput = document.getElementById('chatbotInput');
+const chatbotSend = document.getElementById('chatbotSend');
+const chatbotStatus = document.getElementById('chatbotStatus');
 
-const responses = {
-  quickbooks: {
-    target: '#quickbooks',
-    message: 'QuickBooks support is a great fit if you need help with records, reports, or getting your bookkeeping system organized. I\'ll take you there now.'
-  },
-  training: {
-    target: '#training',
-    message: 'Setup and training can help you get your systems in place and feel confident using them. I\'ll guide you to that section.'
-  },
-  bookkeeping: {
-    target: '#bookkeeping',
-    message: 'Bookkeeping support can help keep your records accurate and up to date. I\'ll show you that service now.'
-  },
-  notary: {
-    target: '#notary',
-    message: 'Notary services are available for important business documents. I\'ll take you to that section.'
-  },
-  'new-business': {
-    target: '#new-business',
-    message: 'New business setup support is perfect if you\'re just getting started and want help with the basics. I\'ll bring you there now.'
-  },
-  consultation: {
-    target: '#consultation',
-    message: 'Great choice. A consultation is the best way to talk through your needs directly. I\'ll take you to the consultation form now.'
+const conversation = [
+  {
+    role: 'assistant',
+    content: 'Hi! I’m the STAT Services assistant. What can I help you with today?'
   }
-};
+];
+
+let isSending = false;
 
 function setChatbotOpen(isOpen) {
+  if (!chatbotPanel || !chatbotToggle) return;
   chatbotPanel.hidden = !isOpen;
   chatbotToggle.setAttribute('aria-expanded', String(isOpen));
-}
-
-function appendMessage(text) {
-  const message = document.createElement('div');
-  message.className = 'chatbot-message bot-message';
-  message.textContent = text;
-  chatbotBody.insertBefore(message, chatbotOptions);
 }
 
 function clearHighlights() {
@@ -49,33 +29,116 @@ function clearHighlights() {
   });
 }
 
-function guideTo(choice) {
-  const response = responses[choice];
-  if (!response) return;
+function highlightSectionFromText(text) {
+  const normalized = text.toLowerCase();
+  const sectionMap = [
+    { keywords: ['quickbooks'], selector: '#quickbooks' },
+    { keywords: ['setup', 'training'], selector: '#training' },
+    { keywords: ['bookkeeping'], selector: '#bookkeeping' },
+    { keywords: ['notary'], selector: '#notary' },
+    { keywords: ['new business', 'startup', 'start a business'], selector: '#new-business' },
+    { keywords: ['consultation', 'consult'], selector: '#consultation' }
+  ];
 
-  appendMessage(response.message);
-  const target = document.querySelector(response.target);
+  for (const section of sectionMap) {
+    if (section.keywords.some((keyword) => normalized.includes(keyword))) {
+      const target = document.querySelector(section.selector);
+      if (target) {
+        clearHighlights();
+        target.classList.add('active-target');
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      break;
+    }
+  }
+}
 
-  if (target) {
-    clearHighlights();
-    target.classList.add('active-target');
-    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+function appendMessage(role, text) {
+  if (!chatbotMessages) return;
+
+  const message = document.createElement('div');
+  message.className = `chatbot-message ${role === 'user' ? 'user-message' : 'bot-message'}`;
+  message.textContent = text;
+  chatbotMessages.appendChild(message);
+  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+function setLoadingState(loading) {
+  isSending = loading;
+  if (!chatbotInput || !chatbotSend) return;
+  chatbotInput.disabled = loading;
+  chatbotSend.disabled = loading;
+  chatbotSend.textContent = loading ? 'Sending…' : 'Send';
+}
+
+function setStatus(message = '', isError = false) {
+  if (!chatbotStatus) return;
+  chatbotStatus.hidden = !message;
+  chatbotStatus.textContent = message;
+  chatbotStatus.classList.toggle('error', isError);
+}
+
+async function sendChatMessage(userMessage) {
+  const response = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      messages: conversation,
+      userMessage
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('Unable to reach assistant right now.');
+  }
+
+  return response.json();
+}
+
+async function handleSubmit(messageText) {
+  const trimmed = messageText.trim();
+  if (!trimmed || isSending) return;
+
+  appendMessage('user', trimmed);
+  conversation.push({ role: 'user', content: trimmed });
+  setStatus();
+  setLoadingState(true);
+
+  try {
+    const data = await sendChatMessage(trimmed);
+    const reply = data?.reply || 'Thanks for your message. Please request a consultation and we can help further.';
+    appendMessage('assistant', reply);
+    conversation.push({ role: 'assistant', content: reply });
+    highlightSectionFromText(`${trimmed} ${reply}`);
+  } catch (error) {
+    setStatus(error.message || 'Something went wrong. Please try again.', true);
+  } finally {
+    setLoadingState(false);
+    if (chatbotInput) chatbotInput.focus();
   }
 }
 
 chatbotToggle?.addEventListener('click', () => {
-  const isOpen = chatbotPanel.hidden;
-  setChatbotOpen(isOpen);
+  const isOpen = chatbotPanel?.hidden;
+  setChatbotOpen(Boolean(isOpen));
 });
 
 chatbotClose?.addEventListener('click', () => {
   setChatbotOpen(false);
 });
 
-chatbotOptions?.addEventListener('click', (event) => {
-  const button = event.target.closest('button[data-choice]');
-  if (!button) return;
+chatbotForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (!chatbotInput) return;
+  const text = chatbotInput.value;
+  chatbotInput.value = '';
+  await handleSubmit(text);
+});
 
-  const choice = button.getAttribute('data-choice');
-  guideTo(choice);
+chatbotQuickActions?.addEventListener('click', async (event) => {
+  const button = event.target.closest('button[data-prompt]');
+  if (!button) return;
+  const prompt = button.getAttribute('data-prompt');
+  if (!prompt) return;
+  await handleSubmit(prompt);
 });

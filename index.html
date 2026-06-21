@@ -177,18 +177,33 @@
         </div>
         <button class="chatbot-close" id="chatbotClose" aria-label="Close chatbot">×</button>
       </div>
-      <div class="chatbot-body" id="chatbotBody">
-        <div class="chatbot-message bot-message">
-          Hi! I can help guide you to the right service. Choose an option below to get started.
+      <div class="chatbot-body">
+        <div class="chatbot-messages" id="chatbotMessages">
+          <div class="chatbot-message bot-message">
+            Hi! I’m the STAT Services assistant. What can I help you with today?
+          </div>
         </div>
-        <div class="chatbot-options" id="chatbotOptions">
-          <button data-choice="quickbooks">QuickBooks support</button>
-          <button data-choice="training">Setup &amp; training</button>
-          <button data-choice="bookkeeping">Bookkeeping</button>
-          <button data-choice="notary">Notary services</button>
-          <button data-choice="new-business">New business setup</button>
-          <button data-choice="consultation">Request a consultation</button>
+        <div class="chatbot-quick-actions" id="chatbotQuickActions">
+          <button type="button" data-prompt="I need QuickBooks support for my business.">QuickBooks support</button>
+          <button type="button" data-prompt="I need help with setup and training.">Setup &amp; training</button>
+          <button type="button" data-prompt="I need bookkeeping support.">Bookkeeping</button>
+          <button type="button" data-prompt="I need notary services.">Notary services</button>
+          <button type="button" data-prompt="I need help with new business setup.">New business setup</button>
+          <button type="button" data-prompt="I want to request a consultation.">Request a consultation</button>
         </div>
+        <form class="chatbot-form" id="chatbotForm">
+          <label class="sr-only" for="chatbotInput">Ask STAT Assistant</label>
+          <input
+            id="chatbotInput"
+            name="message"
+            type="text"
+            maxlength="600"
+            placeholder="Ask a question about your business support needs..."
+            required
+          />
+          <button type="submit" id="chatbotSend">Send</button>
+        </form>
+        <p class="chatbot-status" id="chatbotStatus" role="status" hidden></p>
       </div>
     </div>
   </div>

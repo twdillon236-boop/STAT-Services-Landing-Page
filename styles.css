@@ -89,7 +89,7 @@ a {
 
 .btn:hover,
 .nav-button:hover,
-.chatbot-options button:hover,
+.chatbot-quick-actions button:hover,
 .chatbot-toggle:hover,
 .chatbot-close:hover {
   transform: translateY(-1px);
@@ -304,7 +304,8 @@ textarea:focus {
 
 .chatbot-toggle,
 .chatbot-close,
-.chatbot-options button {
+.chatbot-quick-actions button,
+.chatbot-form button {
   cursor: pointer;
   border: 0;
   font: inherit;
@@ -343,6 +344,12 @@ textarea:focus {
   padding: 1rem;
 }
 
+.chatbot-messages {
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+
 .chatbot-message {
   margin: 0 0 1rem;
   padding: 0.9rem 1rem;
@@ -356,23 +363,81 @@ textarea:focus {
   color: var(--text);
 }
 
-.chatbot-options {
-  display: grid;
-  gap: 0.75rem;
+.user-message {
+  margin-left: 1.5rem;
+  background: linear-gradient(135deg, var(--primary), #dd2530);
+  color: white;
+  border-color: transparent;
 }
 
-.chatbot-options button {
+.chatbot-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.8rem;
+}
+
+.chatbot-quick-actions button {
   text-align: left;
-  padding: 0.85rem 1rem;
+  padding: 0.7rem 0.85rem;
   border-radius: 14px;
   background: white;
   border: 1px solid var(--border);
   color: var(--primary-dark);
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 0.88rem;
 }
 
-.chatbot-options button:hover {
+.chatbot-quick-actions button:hover {
   background: #fff2f3;
+}
+
+.chatbot-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chatbot-form input {
+  margin: 0;
+  border-radius: 12px;
+  padding: 0.8rem 0.85rem;
+  font-size: 0.9rem;
+}
+
+.chatbot-form button {
+  border-radius: 12px;
+  padding: 0.8rem 0.95rem;
+  background: linear-gradient(135deg, var(--primary), #dd2530);
+  color: white;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.chatbot-form button:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.chatbot-status {
+  margin: 0.6rem 0 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.chatbot-status.error {
+  color: var(--primary-dark);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .service-card.active-target,
@@ -425,5 +490,9 @@ textarea:focus {
   .chatbot-panel,
   .chatbot-toggle {
     width: 100%;
+  }
+
+  .chatbot-quick-actions {
+    grid-template-columns: 1fr;
   }
 }
